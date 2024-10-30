@@ -49,6 +49,7 @@ const sendPostRequest = async (userId) => {
     const question = questions[Math.floor(Math.random() * questions.length)];
     const deviceId = uuidv4();
     const userAgent = userAgents[Math.floor(Math.random() * userAgents.length)];
+    const timestamp = new Date().toLocaleString(); // Thời gian hiện tại
 
     const data = `username=${encodeURIComponent(username)}&question=${encodeURIComponent(question)}&deviceId=${deviceId}&gameSlug=&referrer=`;
 
@@ -66,27 +67,32 @@ const sendPostRequest = async (userId) => {
             headers,
             timeout: 10000
         });
+        
         config.successCount++;
-        const logMessage = `Thành công: Nhận phản hồi cho câu hỏi "${question}". Dữ liệu phản hồi: ${JSON.stringify(response.data)}`;
+        
+        const logMessage = `✅ [${timestamp} ⏰] Thành công: Đã gửi câu hỏi 💬 "${question}" đến người dùng "${username}". Phản hồi từ máy chủ: ${JSON.stringify(response.data)}`;
+        
         console.log(logMessage);
-        io.to(userId).emit('log', logMessage);
+        io.to(userId).emit('log', logMessage); 
         io.to(userId).emit('updateCounts', { successCount: config.successCount, failureCount: config.failureCount });
     } catch (error) {
         config.failureCount++;
-        const errorMessage = `Thất bại: Yêu cầu thất bại cho câu hỏi "${question}". Lỗi: ${error.message}`;
+        
+        const errorMessage = `❌ [${timestamp} ⏰] Thất bại: Gửi câu hỏi 💬 "${question}" không thành công. Lỗi: ${error.message}`;
+        
         console.error(errorMessage);
         io.to(userId).emit('log', errorMessage);
         io.to(userId).emit('updateCounts', { successCount: config.successCount, failureCount: config.failureCount });
     }
 };
 
+
 io.on('connection', (socket) => {
-    // Chỉ ghi log khi người dùng mới kết nối lần đầu
+    
     if (!userConfigs[socket.id]) {
         console.log('Khách hàng đã kết nối để cập nhật cấu hình');
     }
 
-    // Khởi tạo cấu hình người dùng
     userConfigs[socket.id] = {
         username: config.username,
         questions: config.questions,
@@ -96,7 +102,6 @@ io.on('connection', (socket) => {
         socketId: socket.id
     };
 
-    // Lưu người dùng vào MongoDB
     const newUser = new User({
         username: config.username,
         questions: config.questions,
@@ -108,10 +113,10 @@ io.on('connection', (socket) => {
         .catch(err => console.error('Lỗi lưu thông tin người dùng:', err));
 
     const userId = socket.id;
-    let intervalId = null; // Để giữ ID của interval
+    let intervalId = null;
 
     socket.on('start', () => {
-        // Khởi động việc gửi yêu cầu chỉ khi có câu hỏi hợp lệ
+ 
         if (userConfigs[userId].questions.length === 0) {
             socket.emit('updateStatus', 'Vui lòng nhập ít nhất một câu hỏi trước khi bắt đầu.');
             return;
@@ -123,10 +128,9 @@ io.on('connection', (socket) => {
 
     socket.on('updateConfig', (newConfig) => {
         userConfigs[userId].username = newConfig.username;
-        userConfigs[userId].questions = newConfig.questions.filter(q => q.trim() !== ""); // Lọc các câu hỏi trống
+        userConfigs[userId].questions = newConfig.questions.filter(q => q.trim() !== ""); 
         userConfigs[userId].interval = newConfig.interval;
 
-        // Ngừng và khởi động lại interval
         clearInterval(intervalId); 
         if (userConfigs[userId].questions.length > 0) {
             intervalId = setInterval(() => sendPostRequest(userId), userConfigs[userId].interval * 1000);
@@ -134,7 +138,6 @@ io.on('connection', (socket) => {
 
         socket.emit('updateStatus', 'Cấu hình đã được cập nhật thành công!');
 
-        // Cập nhật thông tin người dùng trong MongoDB
         User.updateOne({ socketId: userId }, {
             username: newConfig.username,
             questions: newConfig.questions.filter(q => q.trim() !== "")

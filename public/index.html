@@ -3,55 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="NGL Spammer for sending anonymous messages.">
+    <meta name="keywords" content="NGL, Spammer, Anonymous, Messaging">
     <title>NGL Spammer</title>
     <script src="/socket.io/socket.io.js"></script>
-    <style>
-        body { font-family: Arial, sans-serif; }
-        #logs { border: 1px solid #ccc; padding: 10px; margin-top: 10px; height: 300px; overflow-y: auto; }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
 </head>
-<body>
-    <h1>NGL Spammer</h1>
-    <form id="configForm">
-        <label for="username">Tên người dùng:</label>
-        <input type="text" id="username" required><br><br>
-        <label for="interval">Khoảng thời gian (giây):</label>
-        <input type="number" id="interval" value="2" required><br><br>
-        <label for="questions">Câu hỏi (cách nhau bằng dấu phẩy):</label>
-        <textarea id="questions" required></textarea><br><br>
-        <button type="submit">Cập nhật cấu hình</button>
-        <button type="button" id="stopButton">Dừng</button>
-    </form>
-    <div id="logs"></div>
+<body>  
+    <h1>
+        <img src="https://imgur.com/2s5YYxR.png" alt="Logo" style="height: 50px; vertical-align: middle; margin-right: 10px;">
+        NGL Spammer
+        <div class="contact-info">
+            <p>Liên hệ:</p>
+            <a href="https://www.facebook.com/KenjiDevv" target="_blank">
+                <img src="https://img.icons8.com/ios-filled/50/ffffff/facebook-new.png" alt="Facebook" class="facebook-icon" style="height: 20px;">
+                Facebook
+            </a>
+            <a href="mailto:kenjiakira2006@gmail.com">
+                <img src="https://img.icons8.com/material-outlined/24/ffffff/gmail-new.png" alt="Gmail" class="gmail-icon" style="height: 20px;">
+                Gmail
+            </a>
+            <a href="https://www.linkedin.com/in/akira-kenji-348557291/" target="_blank">
+                <img src="https://img.icons8.com/ios-filled/50/ffffff/linkedin-circled.png" alt="LinkedIn" class="linkedin-icon" style="height: 20px;">
+                LinkedIn
+            </a>
+        </div> 
+    </h1>
+    <div class="container">
+        <div class="form-container">
+            <form id="configForm">
+                <div class="message-notice">
+                    Hãy thử gửi cho bạn bè của bạn 1 điều bất ngờ :)))<br>
+                    <span>⚠️ Không lạm dụng</span>
+                </div>
+                <label for="username">
+                    <img src="https://img.icons8.com/ios-filled/24/000000/user.png" alt="Tên người dùng" style="vertical-align: middle; margin-right: 5px;">
+                    Tên người dùng:
+                </label>
+                <input type="text" id="username" placeholder="@user_name" required>
+            
+                <label for="interval">
+                    <img src="https://img.icons8.com/ios-filled/24/000000/timer.png" alt="Khoảng thời gian" style="vertical-align: middle; margin-right: 5px;">
+                    Khoảng thời gian (giây):
+                </label>
+                <input type="number" id="interval" value="2" min="0" required>
+            
+                <label for="questions">
+                    <img src="https://img.icons8.com/ios-filled/24/000000/question-mark.png" alt="Câu hỏi" style="vertical-align: middle; margin-right: 5px;">
+                    Câu hỏi (cách nhau bằng dấu phẩy):
+                </label>
+                <textarea id="questions" placeholder="Nay Bạn Khỏe không?" required></textarea>
+            
+                <div class="button-container">
+                    <button type="submit">Gửi Đi</button>
+                    <button type="button" id="stopButton">Dừng</button>
+                </div>
+                <div class="status-container">
+                    <p id="successCount">✅ Thành công: 0</p>
+                    <p id="failureCount">❌ Thất bại: 0</p>
+                </div>
+                <p class="footer-text">Created By <a href="https://www.facebook.com/KenjiDevv" target="_blank" class="kenji-link">KenjiDev</a></p>
+            </form>
+            
+        </div> 
+        <div class="logs-container">
+            <div id="logs"></div>
+        </div>
+        <div class="notification" id="notification" style="display: none;"></div>
+    </div> 
 
     <script>
         const socket = io();
         const logsDiv = document.getElementById('logs');
+        const successCountEl = document.getElementById('successCount');
+        const failureCountEl = document.getElementById('failureCount');
         
         document.getElementById('configForm').onsubmit = (e) => {
             e.preventDefault();
             const username = document.getElementById('username').value;
             const interval = document.getElementById('interval').value;
             const questions = document.getElementById('questions').value.split(',').map(q => q.trim());
-
+    
             socket.emit('updateConfig', { username, interval, questions });
         };
-
+    
         document.getElementById('stopButton').onclick = () => {
             socket.emit('stop');
         };
 
-        socket.on('log', (message) => {
-            logsDiv.innerHTML += `<p>${message}</p>`;
-            logsDiv.scrollTop = logsDiv.scrollHeight;
+        document.getElementById('questions').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault(); 
+                document.getElementById('configForm').dispatchEvent(new Event('submit'));
+            }
+        });
+    
+        socket.on('log', (message, isSuccess) => {
+            const logClass = isSuccess ? 'success' : 'failure'; 
+            const logElement = document.createElement('p');
+            logElement.className = `${logClass} new-log`; 
+            logElement.textContent = message;
+
+            logsDiv.appendChild(logElement); 
+            logsDiv.scrollTop = logsDiv.scrollHeight; 
+
+            setTimeout(() => {
+                logElement.classList.remove('new-log');
+            }, 300);
         });
 
         socket.on('updateStatus', (status) => {
-            alert(status);
+            const notification = document.getElementById('notification');
+            notification.textContent = status;
+            notification.classList.add('show');
+            notification.style.display = 'block';
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 500);
+            }, 3000);
         });
 
         socket.on('updateCounts', (counts) => {
-            console.log(`Thành công: ${counts.successCount}, Thất bại: ${counts.failureCount}`);
+            successCountEl.textContent = `✅ Thành công: ${counts.successCount}`;
+            failureCountEl.textContent = `❌ Thất bại: ${counts.failureCount}`;
         });
     </script>
 </body>
