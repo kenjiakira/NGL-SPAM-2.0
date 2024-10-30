@@ -1,3 +1,4 @@
+
 # Công Cụ NGL Spammer
 
 ![Logo NGL Spammer](logo.jpeg)
@@ -36,10 +37,49 @@ Hãy chắc chắn rằng bạn đã cài đặt **Node.js** và **npm** trên m
    npm install
    ```
 
-3. **Chỉnh sửa cấu hình:**
-   - Mở file `config.json` và thiết lập tên người dùng cùng các câu hỏi.
+3. **Đăng Ký MongoDB:**
+   - Truy cập vào [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
+   - Đăng ký một tài khoản hoặc đăng nhập nếu bạn đã có tài khoản.
+   - Tạo một cluster mới:
+     - Nhấn vào nút "Build a Cluster".
+     - Chọn cấu hình cluster phù hợp với nhu cầu của bạn (có tùy chọn miễn phí).
+     - Nhấn "Create Cluster".
+   - **Tạo một database**:
+     - Sau khi cluster được tạo, nhấn vào "Collections".
+     - Nhấn "Create Database", đặt tên cho database (ví dụ: `ngldb`).
+   - **Tạo một user**:
+     - Trong phần **Database Access**, thêm một user mới với quyền truy cập phù hợp và ghi lại tên người dùng và mật khẩu.
+   - **Lấy chuỗi kết nối**:
+     - Nhấn vào "Connect" trên cluster của bạn.
+     - Chọn "Connect your application".
+     - Sao chép chuỗi kết nối, nó sẽ có dạng:
+       ```plaintext
+       mongodb+srv://<username>:<password>@cluster0.mongodb.net/<dbname>?retryWrites=true&w=majority
+       ```
 
-4. **Chạy script:**
+4. **Chỉnh sửa cấu hình:**
+   - Tạo file `.env` trong thư mục gốc của dự án và thêm các biến môi trường sau:
+     ```plaintext
+     DB_USER=your_username_here
+     DB_PASSWORD=your_password_here
+     DB_NAME=ngldb
+     ```
+
+   - Cập nhật mã nguồn trong file `index.js` để sử dụng biến môi trường:
+     ```javascript
+     const mongoose = require('mongoose');
+     require('dotenv').config(); // Thêm dòng này để sử dụng dotenv
+
+     mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@ngl.5koo9.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`)
+     .then(() => {
+         console.log('Kết nối đến MongoDB thành công!');
+     })
+     .catch(err => {
+         console.error('Kết nối đến MongoDB thất bại:', err);
+     });
+     ```
+
+5. **Chạy script:**
    ```bash
    node index.js
    ```
@@ -94,10 +134,17 @@ Thay đổi cài đặt trong file `config.json`:
      node index.js
      ```
 
-4. **Triển Khai:**
+4. **Thêm Biến Môi Trường cho MongoDB:**
+   - Trong phần cấu hình dịch vụ Render, tìm đến **Environment**.
+   - Thêm các biến môi trường tương tự như bạn đã làm với file `.env`:
+     - **DB_USER**: `your_username_here`
+     - **DB_PASSWORD**: `your_password_here`
+     - **DB_NAME**: `ngldb`
+
+5. **Triển Khai:**
    - Nhấn "Create Web Service" để triển khai script. Chờ quá trình hoàn tất.
 
-5. **Truy Cập Script:**
+6. **Truy Cập Script:**
    - Sau khi triển khai, Render sẽ cung cấp cho bạn một URL để truy cập vào script của bạn.
 
 ---
@@ -129,7 +176,7 @@ Dự án này thuộc giấy phép MIT. Kiểm tra file [LICENSE](LICENSE) để
 
 ## Chủ Dự Án
 
-Dự án này được duy trì bởi [JrDev06](https://www.facebook.com/profile.php?id=100091592152325). Hãy liên hệ nếu bạn có bất kỳ thắc mắc nào!
+Dự án này được duy trì bởi JrDev06 và KenjiDev (HNT). Hãy liên hệ nếu bạn có bất kỳ thắc mắc nào!
 
 ---
 
