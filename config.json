@@ -1,0 +1,17 @@
+{
+    "interval": 2,
+    "username": "username_here",
+    "questions": [
+        "Có điều gì mà bạn chưa từng kể với ai không?",
+        "Bạn có tin vào duyên số không?",
+        "Nếu được chọn một nơi để du lịch ngay bây giờ, bạn sẽ chọn nơi nào?",
+        "Điều gì làm bạn hạnh phúc nhất lúc này?",
+        "Bí mật lớn nhất của bạn là gì?",
+        "Bạn có thích người khác chủ động không?",
+        "Điều gì khiến bạn cảm thấy tự tin nhất?",
+        "Nếu chỉ còn một ngày để sống, bạn sẽ làm gì?",
+        "Bạn có thích những buổi tối yên bình hay những đêm tiệc tùng không?",
+        "Có ai đặc biệt mà bạn đang nhớ không?",
+        "Sở thích kỳ lạ nhất của bạn là gì?"
+    ] 
+}
