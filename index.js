@@ -13,7 +13,7 @@ let intervalMs = config.interval * 1000;
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
-const PORT = process.env.PORT || 9999;
+const PORT = process.env.PORT || 5555;
 
 mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@ngl.5koo9.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`)
     .then(() => {
