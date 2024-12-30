@@ -188,7 +188,6 @@ button:hover {
     }
 }
 
-/* Scrollbar styling */
 ::-webkit-scrollbar {
     width: 8px;
 }
@@ -202,7 +201,6 @@ button:hover {
     border-radius: 4px;
 }
 
-/* Mobile Responsive */
 @media (max-width: 768px) {
     .container {
         grid-template-columns: 1fr;
@@ -221,7 +219,6 @@ button:hover {
     }
 }
 
-/* Mobile Responsive */
 @media (max-width: 768px) {
     body {
         padding: 0.5rem;
@@ -280,7 +277,6 @@ button:hover {
     }
 }
 
-/* Fix for mobile console height */
 @media (max-width: 768px) {
     .container {
         height: 100vh;
@@ -445,7 +441,6 @@ input[type="number"]::-webkit-outer-spin-button:active {
     background-color: var(--gradient-start);
 }
 
-/* Mobile adjustments for number input */
 @media (max-width: 768px) {
     input[type="number"] {
         padding-right: 1.5rem;
